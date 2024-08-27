@@ -9,11 +9,4 @@ This Java Calendar Application is a console-based utility that allows users to v
 - **Easy Navigation**: Move through days and months with simple command inputs.
 - **Data Persistence**: Events are loaded from and saved to a text file, maintaining state between sessions.
 
-## Installation
-To run this application, you'll need:
-- Java 8 or higher installed on your machine.
 
-Clone the repository to your local machine:
-```bash
-git clone https://github.com/yourusername/java-calendar.git
-cd java-calendar
