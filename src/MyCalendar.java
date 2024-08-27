@@ -14,7 +14,7 @@ import java.util.LinkedHashSet;
 
 
 public class MyCalendar {
-    private List<Event> events;
+    public List<Event> events;
     private LocalDate currentDate;
 
     public MyCalendar() {
@@ -68,6 +68,7 @@ public class MyCalendar {
 
 
             }
+            System.out.println("Loading is done!");
 
         }catch (IOException e) {
             System.err.println("Error reading from file: " + e.getMessage());

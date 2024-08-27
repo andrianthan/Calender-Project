@@ -12,6 +12,6 @@ public class TimeInterval {
 
     public boolean overLap(TimeInterval s)
     {
-
+        return true;
     }
 }

@@ -40,13 +40,44 @@ public class Event {
         {
             System.out.print(s);
         }
-        System.out.println(" " + startTime.toString() +" " +  endTime.toString() + " " + formatter.format(startDate) + " " + formatter.format(endDate));
+        System.out.println(" " + startTime.toString() + " " +  endTime.toString() + " " + formatter.format(startDate) + " " + formatter.format(endDate));
+
+    }
+
+    public LocalDate getDate(){
+        return date;
+    }
+
+    public String getEventName(){
+        return eventName;
+    }
+
+    public LocalTime getStartTime()
+    {
+        return startTime;
+    }
+
+    public LocalTime getEndTime(){
+        return endTime;
     }
 
     public void printOneTime(){
 
     }
-    public void print
 
+    public boolean isRecurring() {
+        return recurring;
+    }
 
+    public Set<String> getRecurringDays() {
+        return recurringDays;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public LocalDate getEndDate(){
+        return endDate;
+    }
 }
