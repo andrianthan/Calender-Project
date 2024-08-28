@@ -41,7 +41,7 @@ public class MyCalendarTester {
         System.out.println();
         calendar.loadEvents("events.txt");
         System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
-        String input = scan.next();
+        String input = scan.next().toUpperCase();
         while (!(input.equals("Q")))
         {
             if(input.equals("V")) {
@@ -79,9 +79,8 @@ public class MyCalendarTester {
         int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue();
         Scanner scan = new Scanner(System.in);
         input = input.toUpperCase();
-        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E, MMM d yyyy");
+        System.out.println(input);
         DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
-        boolean eventFound = false;
 
         Set<LocalDate> daysWithEvents = new HashSet<>();
         for (Event event : events) {
@@ -97,7 +96,7 @@ public class MyCalendarTester {
                     }
                 }
             } else {
-                // Single occurrence events
+                // single occurrence events
                 if (event.getDate().getMonth() == currentDate.getMonth() && event.getDate().getYear() == currentDate.getYear()) {
                     daysWithEvents.add(event.getDate());
                 }
@@ -106,67 +105,133 @@ public class MyCalendarTester {
 
         if(input.equals("D"))
         {
-            System.out.println(dayFormatter.format(currentDate));
-            for(Event event : events)
+            displayDayEvents(currentDate, calendar);
+            System.out.println("[P]revious, [N]ext, [G]o back to main menu?");
+            String subMenuInput = scan.next().toUpperCase();
+            while(!(subMenuInput.equals("G")))
             {
-                if(currentDate.equals(event.getDate()))
+                if(subMenuInput.equals("P"))
                 {
-                    System.out.println(event.getEventName() + " : " + event.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + event.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-                    eventFound = true;
+                    currentDate = currentDate.minusDays(1);
+                    displayDayEvents(currentDate, calendar);
+                    System.out.println("[P]revious, [N]ext, [G]o back to main menu?");
+                    subMenuInput = scan.next().toUpperCase();
+
+                }else if(subMenuInput.equals("N"))
+                {
+                    currentDate = currentDate.plusDays(1);
+                    displayDayEvents(currentDate, calendar);
+                    System.out.println("[P]revious, [N]ext, [G]o back to main menu?");
+                    subMenuInput = scan.next().toUpperCase();
+                }else{
+                    System.out.println("Please enter a valid input");
+                    subMenuInput = scan.next().toUpperCase();
                 }
-
             }
-            if(!eventFound)
-            {
-                System.out.println("No events found today");
-            }
-
-
         }else if(input.equals("M")){
-// Handle month view
-            System.out.println(monthFormatter.format(currentDate));
-            System.out.println("Su Mo Tu We Th Fr Sa");
-            for (int i = 1; i < firstDayOfWeek; i++) {
-                System.out.print("   ");
-            }
-            while (dayOfMonth <= monthLength) {
-                LocalDate currentDay = firstDayMonth.withDayOfMonth(dayOfMonth);
-                boolean hasEvent = false;
-                for (Event event : events) {
-                    if (event.isRecurring()) {
-                        // Check if the current day's day of week matches any in the event's recurringDays
-                        if (event.getRecurringDays().contains(currentDay.getDayOfWeek().toString().substring(0, 1)) &&
-                                !currentDay.isBefore(event.getStartDate()) &&
-                                !currentDay.isAfter(event.getEndDate())) {
-                            hasEvent = true;
-                            break;  // Once a match is found, no need to check further
-                        }
-                    } else {
-                        // For non-recurring events, check date directly
-                        if (currentDay.equals(event.getDate())) {
-                            hasEvent = true;
-                            break;
-                        }
-                    }
-                }
+            displayMonthEvents(currentDate, calendar);
+            System.out.println("[P]revious, [N]ext, [G]o back to main menu?");
+            String subMenuInput = scan.next().toUpperCase();
+            while(!(subMenuInput.equals("G")))
+            {
+                if(subMenuInput.equals("P"))
+                {
+                    currentDate = currentDate.minusMonths(1);
+                    displayMonthEvents(currentDate, calendar);
+                    System.out.println("[P]revious, [N]ext, [G]o back to main menu?");
+                    subMenuInput = scan.next().toUpperCase();
+                }else if(subMenuInput.equals("N"))
+                {
+                    currentDate = currentDate.plusMonths(1);
+                    displayMonthEvents(currentDate, calendar);
+                    System.out.println("[P]revious, [N]ext, [G]o back to main menu?");
+                    subMenuInput = scan.next().toUpperCase();
 
-                if (currentDay.getDayOfWeek() == DayOfWeek.SUNDAY && dayOfMonth != 1) {
-                    System.out.println();
+
+                }else{
+                    System.out.println("Please enter a valid input");
+                    subMenuInput = scan.next();
                 }
-                if (hasEvent) {
-                    System.out.print("[" + (dayOfMonth < 10 ? " " : "") + dayOfMonth + "]");
-                } else {
-                    System.out.print((dayOfMonth < 10 ? "  " : " ") + dayOfMonth);
-                }
-                dayOfMonth++;
             }
-            System.out.println();
 
         }else{
             System.out.println("Please enter a valid input of D or M");
             input = scan.next();
             view(input, calendar);
         }
+
+    }
+
+    public static void displayDayEvents(LocalDate currentDate, MyCalendar calendar){
+
+        DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E, MMM d yyyy");
+        List<Event> events = calendar.events;
+        boolean eventFound = false;
+
+
+        System.out.println(dayFormatter.format(currentDate));
+        for(Event event : events)
+        {
+            if(currentDate.equals(event.getDate()))
+            {
+                System.out.println(event.getEventName() + " : " + event.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + event.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+                eventFound = true;
+            }
+
+        }
+        if(!eventFound)
+        {
+            System.out.println("No events found today");
+        }
+        System.out.println();
+    }
+
+    public static void displayMonthEvents(LocalDate currentDate, MyCalendar calendar){
+        List<Event> events = calendar.events;
+        LocalDate firstDayMonth = currentDate.withDayOfMonth(1); //gets the first day of current month
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+        int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue();
+        int monthLength = currentDate.lengthOfMonth(); //gets the length of the month
+        int dayOfMonth = 1;
+
+        System.out.println(monthFormatter.format(currentDate));
+        System.out.println("Su Mo Tu We Th Fr Sa");
+        int spaces = (firstDayOfWeek % 7) * 3;  // Calculating the initial spaces (Sunday starts at index 0)
+        for (int i = 0; i < spaces; i++) {
+            System.out.print(" ");
+        }
+        while (dayOfMonth <= monthLength) {
+            LocalDate currentDay = firstDayMonth.withDayOfMonth(dayOfMonth);
+            boolean hasEvent = false;
+            for (Event event : events) {
+                if (event.isRecurring()) {
+                    // Check if the current day's day of week matches any in the event's recurringDays
+                    if (event.getRecurringDays().contains(currentDay.getDayOfWeek().toString().substring(0, 1)) &&
+                            !currentDay.isBefore(event.getStartDate()) &&
+                            !currentDay.isAfter(event.getEndDate())) {
+                        hasEvent = true;
+                        break;  // Once a match is found, no need to check further
+                    }
+                } else {
+                    // For non-recurring events, check date directly
+                    if (currentDay.equals(event.getDate())) {
+                        hasEvent = true;
+                        break;
+                    }
+                }
+            }
+
+            if (currentDay.getDayOfWeek() == DayOfWeek.SUNDAY && dayOfMonth != 1) {
+                System.out.println();
+            }
+            if (hasEvent) {
+                System.out.print("[" + (dayOfMonth < 10 ? " " : "") + dayOfMonth + "]");
+            } else {
+                System.out.print((dayOfMonth < 10 ? "  " : " ") + dayOfMonth);
+            }
+            dayOfMonth++;
+        }
+        System.out.println("\n");
 
     }
 
