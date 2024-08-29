@@ -1,26 +1,26 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
+
 import java.util.List;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
+import java.io.BufferedWriter;
 import java.util.Set;
 import java.util.LinkedHashSet;
 
 
 public class MyCalendar {
-    public List<Event> events;
+    private List<Event> events;
     private LocalDate currentDate;
 
     public MyCalendar() {
         events = new ArrayList<>();
         currentDate = LocalDate.now();
     }
+
     public void loadEvents(String file)
     {
 
@@ -76,6 +76,28 @@ public class MyCalendar {
         }
         //a
 
+    }
+
+    public void addEvent(Event event)
+    {
+        try (FileWriter fileWriter = new FileWriter("src/events.txt", true); // Append to the file
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+             PrintWriter out = new PrintWriter(bufferedWriter)) {
+            // Only handle single events
+            out.println(event.getEventName());
+            out.printf("%s %s %s%n",
+                    event.getDate().format(DateTimeFormatter.ofPattern("M/d/yy")),
+                    event.getStartTime().format(DateTimeFormatter.ofPattern("H:mm")),
+                    event.getEndTime().format(DateTimeFormatter.ofPattern("H:mm")));
+            System.out.println("Event successfully added");
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
+
+    }
+
+    public List<Event> getEvents(){
+        return events;
     }
 
 

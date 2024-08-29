@@ -1,3 +1,4 @@
+import java.time.DateTimeException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -42,36 +43,18 @@ public class MyCalendarTester {
         calendar.loadEvents("events.txt");
         System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
         String input = scan.next().toUpperCase();
-        while (!(input.equals("Q")))
+        while(!(input.equals("Q")))
         {
-            if(input.equals("V")) {
-                System.out.println("[D]ay view or [M]onth view ?");
-                String viewInput = scan.next();
-                view(viewInput, calendar);
-
-            }else if(input.equals("C")){
-
-            }else if(input.equals("G")){
-
-            }else if(input.equals("E")){
-
-            }else if(input.equals("D")){
-
-            }else if(input.equals("Q")){
-                break;
-            }else{
-                System.out.println("Please enter a valid input");
-                input = scan.next();
-            }
+            mainMenu(input, calendar);
             input = scan.next();
-
         }
+
 
     }
 
     //method that lets users choose between the day/month view of the calendar
     public static void view(String input, MyCalendar calendar){
-        List<Event> events = calendar.events;
+        List<Event> events = calendar.getEvents();
         LocalDate currentDate = LocalDate.now();
         int dayOfMonth = 1;
         int monthLength = currentDate.lengthOfMonth();
@@ -153,6 +136,10 @@ public class MyCalendarTester {
                     subMenuInput = scan.next();
                 }
             }
+            if(subMenuInput.equals("G"))
+            {
+
+            }
 
         }else{
             System.out.println("Please enter a valid input of D or M");
@@ -162,10 +149,45 @@ public class MyCalendarTester {
 
     }
 
+    public static void mainMenu(String input, MyCalendar calendar)
+    {
+        Scanner scan = new Scanner(System.in);
+
+        while (!(input.equals("Q")))
+        {
+            if(input.equals("V")) {
+                System.out.println("[D]ay view or [M]onth view ?");
+                String viewInput = scan.next();
+                view(viewInput, calendar);
+                System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
+                input = scan.next().toUpperCase();
+
+            }else if(input.equals("C")){
+                create(calendar, scan);
+                System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
+                input = scan.next().toUpperCase();
+
+            }else if(input.equals("G")){
+
+            }else if(input.equals("E")){
+
+            }else if(input.equals("D")){
+                remove(calendar, scan);
+
+            }else if(input.equals("Q")){
+                break;
+            }else{
+                System.out.println("Please enter a valid input");
+                input = scan.next();
+            }
+
+        }
+    }
+
     public static void displayDayEvents(LocalDate currentDate, MyCalendar calendar){
 
         DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E, MMM d yyyy");
-        List<Event> events = calendar.events;
+        List<Event> events = calendar.getEvents();
         boolean eventFound = false;
 
 
@@ -187,7 +209,7 @@ public class MyCalendarTester {
     }
 
     public static void displayMonthEvents(LocalDate currentDate, MyCalendar calendar){
-        List<Event> events = calendar.events;
+        List<Event> events = calendar.getEvents();
         LocalDate firstDayMonth = currentDate.withDayOfMonth(1); //gets the first day of current month
         DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
         int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue();
@@ -236,11 +258,91 @@ public class MyCalendarTester {
     }
 
     //allows users to schedule a new event
-    public void create(){
+    public static void create(MyCalendar calendar, Scanner scan){
+        DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        DateTimeFormatter  timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+
+        System.out.println("Enter the event name:");
+        String eventName = scan.nextLine().trim();
+        LocalDate date = null;
+        LocalTime startTime = null;
+        LocalTime endTime = null;
+        boolean isBefore = false;
+        while(date == null)
+        {
+            System.out.println("Please enter the date in the following format: MM/DD/YYYY");
+            String dateInput = scan.nextLine().trim();
+            try{
+                date = LocalDate.parse(dateInput, dayFormat);
+            }catch (DateTimeException e){
+                System.out.println("Error: Wrong date format");
+            }
+        }
+        while(!isBefore)
+        {
+            while(startTime == null)
+            {
+                System.out.println("Please enter the start time of the event in 24 hour clock format");
+                String startTimeInput = scan.nextLine().trim();
+                try{
+                    startTime = LocalTime.parse(startTimeInput, timeFormat);
+                }catch (DateTimeException e)
+                {
+                    System.out.println("Error: Wrong time format");
+                }
+            }
+
+            while(endTime == null)
+            {
+                System.out.println("Please enter the end time of the event in 24 hour clock format");
+                String endTimeInput = scan.nextLine().trim();
+                try{
+                    endTime = LocalTime.parse(endTimeInput, timeFormat);
+                }catch (DateTimeException e)
+                {
+                    System.out.println("Error: Wrong time format");
+                }
+            }
+            if(startTime.isAfter(endTime))
+            {
+                System.out.println("The start time of event if after end time. Please try again");
+            }else if(startTime.isBefore((endTime)))
+            {
+                isBefore = true;
+            }else{
+                System.out.println("The start time of event is the same as end time. Please try again");
+            }
+
+
+        }
+        Event e = new Event(eventName, date, startTime, endTime);
+        calendar.addEvent(e);
+        calendar.loadEvents("src/events.txt");
+    }
+
+    public static void remove(MyCalendar calendar, Scanner scan)
+    {
+        System.out.println("Current Events:\n---------------------------------------------");
+        calendar.loadEvents("src/events.txt");
+        System.out.println("---------------------------------------------");
+        System.out.println("Enter the name of the event to delete");
+        String deleteEvent = scan.nextLine();
+        List<Event> events = calendar.getEvents();
+        for(Event e: events)
+        {
+            if(e.getEventName().equals(deleteEvent))
+            {
+                events.remove(e);
+                calendar.loadEvents("src/events.txt");
+                break;
+            }
+        }
+        System.out.println("Event successfully removed");
+
 
     }
 
-    //
+
     public void go(){
 
     }
