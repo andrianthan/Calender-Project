@@ -347,6 +347,55 @@ public class MyCalendarTester {
         String deleteEvent = "";
         if(eventInput.equals("S"))
         {
+            System.out.println("Specify the date and name of a ONE TIME event to be removed.\nPlease enter the date in the format: MM/DD/YYYY");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            LocalDate date = null;
+            while (date == null) {
+                deleteEvent = scan.nextLine();
+                try {
+                    date = LocalDate.parse(deleteEvent, formatter);
+                } catch (DateTimeParseException e) {
+                    System.out.println("Invalid date format. Please use MM/DD/YYYY format.");
+                }
+            }
+            System.out.println("Please specify the name of the ONE TIME event to be removed");
+            deleteEvent = scan.nextLine();
+            Iterator<Event> iterator = events.iterator();
+            boolean isRemoved = false;
+            while(iterator.hasNext())
+            {
+                Event e = iterator.next();
+            if(e != null && e.getDate() != null && e.getDate().equals(date) && e.getEventName().equals(deleteEvent))
+            {
+                iterator.remove();
+                isRemoved = true;
+                System.out.println("Event removed: " + e.getEventName());
+
+            }else if (e == null || e.getDate() == null)
+            {
+                //Skips a null event or event with a null date;
+            }
+            }
+
+            if (isRemoved) {
+                System.out.println("Writing updated events back to file...");
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/events.txt"))) {
+                    for (Event e : events) {
+                        writer.write(e.getEventName() + "\n");
+                        if (!e.isRecurring()) {
+                            writer.write(String.format("%s %s %s\n", e.getDate().format(dayFormat), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat)));
+                        } else {
+                            writer.write(String.format("%s %s %s %s %s\n", e.printRecurringDays(), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat), e.getStartDate().format(dayFormat), e.getEndDate().format(dayFormat)));
+                        }
+                    }
+                    writer.flush();  // Ensure all data is written to the file
+                    System.out.println("File write complete.");
+                } catch (IOException ex) {
+                    System.out.println("Error writing to file: " + ex.getMessage());
+                }
+            } else {
+                System.out.println("Event with given date and name not found");
+            }
 
         }else if(eventInput.equals("A"))
         {
@@ -362,23 +411,6 @@ public class MyCalendarTester {
                 }
             }
             boolean isRemoved = false;
-            /*
-
-            List<Event> events = calendar.getEvents();
-
-            System.out.println(formatter.format(date));
-            for(Event event : events)
-            {
-                if(date.equals(event.getDate()))
-                {
-                    System.out.println(event.getEventName() + " : " + event.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " - " + event.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-
-                    isRemoved = true;
-                }
-
-            }
-            */
-
             Iterator<Event> iterator = events.iterator();
             while(iterator.hasNext()) {
                 Event e = iterator.next();
