@@ -373,7 +373,7 @@ public class MyCalendarTester {
 
             }else if (e == null || e.getDate() == null)
             {
-                //Skips a null event or event with a null date;
+                //Skips a null event or event with a null date;a
             }
             }
 
