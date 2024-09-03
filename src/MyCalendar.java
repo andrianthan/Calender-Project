@@ -1,15 +1,8 @@
 import java.io.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
+import java.util.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
-import java.util.List;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.BufferedWriter;
-import java.util.Set;
-import java.util.LinkedHashSet;
 
 
 public class MyCalendar {
@@ -96,10 +89,59 @@ public class MyCalendar {
 
     }
 
-    public List<Event> getEvents(){
-        return events;
-    }
+    public List<Event> getEvents(){ return events;}
 
+
+    public void printEvents(String file) {
+        DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("MM/dd/yy");
+        DateTimeFormatter fullDateFormat = DateTimeFormatter.ofPattern("EEEE MMMM dd HH:mm");
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+
+        TreeMap<Integer, List<String>> oneTimeEvents = new TreeMap<>();
+        List<String> recurringEvents = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            String eventName = "";
+
+            while ((line = reader.readLine()) != null) {
+                if (!line.contains("/")) {
+                    eventName = line.trim();
+                } else {
+                    String[] parts = line.split(" ");
+                    if (parts.length == 3) {  // One-time events
+                        LocalDate date = LocalDate.parse(parts[0], dayFormat);
+                        LocalTime startTime = LocalTime.parse(parts[1], timeFormat);
+                        LocalTime endTime = LocalTime.parse(parts[2], timeFormat);
+                        LocalDateTime startDateTime = LocalDateTime.of(date, startTime);
+                        int year = date.getYear();
+                        oneTimeEvents.putIfAbsent(year, new ArrayList<>());
+                        oneTimeEvents.get(year).add(String.format("  %s - %s %s", startDateTime.format(fullDateFormat), endTime.format(timeFormat), eventName));
+                    } else if (parts.length == 5) {  // Recurring events
+                        Set<String> recurringDays = new LinkedHashSet<>(Arrays.asList(parts[0].split("")));
+                        LocalTime startTime = LocalTime.parse(parts[1], timeFormat);
+                        LocalTime endTime = LocalTime.parse(parts[2], timeFormat);
+                        LocalDate startDate = LocalDate.parse(parts[3], dayFormat);
+                        LocalDate endDate = LocalDate.parse(parts[4], dayFormat);
+                        recurringEvents.add(String.format("%s\n%s %s %s %s - %s", eventName, String.join("", recurringDays), startTime.format(timeFormat), endTime.format(timeFormat), startDate.format(dayFormat), endDate.format(dayFormat)));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading from file: " + e.getMessage());
+        }
+
+        // Print one-time events
+        System.out.println("ONE TIME EVENTS");
+        oneTimeEvents.forEach((year, events) -> {
+            System.out.println(year);
+            events.forEach(System.out::println);
+        });
+
+        // Print recurring events
+        System.out.println("\nRECURRING EVENTS");
+        recurringEvents.forEach(System.out::println);
+    }
 
 }
 

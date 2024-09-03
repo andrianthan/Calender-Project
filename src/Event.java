@@ -65,20 +65,23 @@ public class Event {
 
     }
 
-    public boolean isRecurring() {
-        return recurring;
-    }
+    public boolean isRecurring() {return recurring;}
 
-    public Set<String> getRecurringDays() {
+    public String printRecurringDays() {
+        String a = "";
+        for(String s: recurringDays)
+        {
+            a = a + s;
+        }
+        return a;
+    }
+    public Set<String> getRecurringDays()
+    {
         return recurringDays;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
-    }
+    public LocalDate getStartDate() {return startDate;}
 
-    public LocalDate getEndDate(){
-        return endDate;
-    }
-    //a
+    public LocalDate getEndDate(){return endDate;}
+
 }

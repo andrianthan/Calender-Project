@@ -1,14 +1,9 @@
-import java.time.DateTimeException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Scanner;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.*;
 
+import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.time.*;
+import java.time.format.DateTimeParseException;
 
 public class MyCalendarTester {
     public static void main(String [] args)
@@ -43,10 +38,9 @@ public class MyCalendarTester {
         calendar.loadEvents("events.txt");
         System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
         String input = scan.next().toUpperCase();
-        while(!(input.equals("Q")))
+        if(!(input.equals("Q")))
         {
-            mainMenu(input, calendar);
-            input = scan.next();
+            mainMenu(input,calendar);
         }
 
 
@@ -107,7 +101,7 @@ public class MyCalendarTester {
                     System.out.println("[P]revious, [N]ext, [G]o back to main menu?");
                     subMenuInput = scan.next().toUpperCase();
                 }else{
-                    System.out.println("Please enter a valid input");
+                    System.out.println("Please enter a valid input [P, N, G]");
                     subMenuInput = scan.next().toUpperCase();
                 }
             }
@@ -116,7 +110,9 @@ public class MyCalendarTester {
             System.out.println("[P]revious, [N]ext, [G]o back to main menu?");
             String subMenuInput = scan.next().toUpperCase();
             while(!(subMenuInput.equals("G")))
+
             {
+
                 if(subMenuInput.equals("P"))
                 {
                     currentDate = currentDate.minusMonths(1);
@@ -133,7 +129,7 @@ public class MyCalendarTester {
 
                 }else{
                     System.out.println("Please enter a valid input");
-                    subMenuInput = scan.next();
+                    subMenuInput = scan.next().toUpperCase();
                 }
             }
             if(subMenuInput.equals("G"))
@@ -157,28 +153,39 @@ public class MyCalendarTester {
         {
             if(input.equals("V")) {
                 System.out.println("[D]ay view or [M]onth view ?");
-                String viewInput = scan.next();
+                String viewInput = scan.next().toUpperCase();
                 view(viewInput, calendar);
                 System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
                 input = scan.next().toUpperCase();
 
             }else if(input.equals("C")){
-                create(calendar, scan);
+                create(calendar);
                 System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
                 input = scan.next().toUpperCase();
 
+
             }else if(input.equals("G")){
+                go(calendar);
+                System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
+                input = scan.next().toUpperCase();
 
             }else if(input.equals("E")){
+                eventList(calendar);
+                System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
+                input = scan.next().toUpperCase();
+
 
             }else if(input.equals("D")){
-                remove(calendar, scan);
+                remove(calendar);
+                System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
+                input = scan.next().toUpperCase();
 
             }else if(input.equals("Q")){
+                System.out.println("Good Bye");
                 break;
             }else{
-                System.out.println("Please enter a valid input");
-                input = scan.next();
+                System.out.println("Please enter a valid input: [V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit");
+                input = scan.next().toUpperCase();
             }
 
         }
@@ -258,7 +265,8 @@ public class MyCalendarTester {
     }
 
     //allows users to schedule a new event
-    public static void create(MyCalendar calendar, Scanner scan){
+    public static void create(MyCalendar calendar){
+        Scanner scan = new Scanner(System.in);
         DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         DateTimeFormatter  timeFormat = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -317,37 +325,88 @@ public class MyCalendarTester {
         }
         Event e = new Event(eventName, date, startTime, endTime);
         calendar.addEvent(e);
-        calendar.loadEvents("src/events.txt");
+        calendar.printEvents("src/events.txt");
     }
 
-    public static void remove(MyCalendar calendar, Scanner scan)
-    {
+
+    public static void remove(MyCalendar calendar) {
+        Scanner scan = new Scanner(System.in);
+        DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("MM/dd/yy");
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+
+        System.out.println("Loading events from file...");
         System.out.println("Current Events:\n---------------------------------------------");
-        calendar.loadEvents("src/events.txt");
-        System.out.println("---------------------------------------------");
-        System.out.println("Enter the name of the event to delete");
-        String deleteEvent = scan.nextLine();
+        calendar.printEvents("src/events.txt");
         List<Event> events = calendar.getEvents();
-        for(Event e: events)
-        {
-            if(e.getEventName().equals(deleteEvent))
-            {
-                events.remove(e);
-                calendar.loadEvents("src/events.txt");
+        System.out.println("---------------------------------------------");
+        //System.out.println("[S]elected: the user specifies the date and name of an ONE TIME event. The specific one time event will be deleted.\n" +
+                "[A]ll: the user specifies a date and then all ONE TIME events scheduled on the date will be deleted.\n" +
+                "[DR]: the user specifies the name of a RECURRING event. The specified recurring event will be deleted. This will delete the recurring event throughout the calendar.\n");
+        //System.out.println("Please enter one of the following:[S]elected  [A]ll   [DR] ");
+        System.out.println("Specify the event name to be removed");
+        String deleteEvent = scan.nextLine();
+
+        boolean isRemoved = false;
+        Iterator<Event> iterator = events.iterator();
+        while(iterator.hasNext()) {
+            Event e = iterator.next();
+            if(e.getEventName().equals(deleteEvent)) {
+                iterator.remove();
+                isRemoved = true;
+                System.out.println("Event removed: " + e.getEventName());
                 break;
             }
         }
-        System.out.println("Event successfully removed");
+
+        if (isRemoved) {
+            System.out.println("Writing updated events back to file...");
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/events.txt"))) {
+                for (Event e : events) {
+                    writer.write(e.getEventName() + "\n");
+                    if (!e.isRecurring()) {
+                        writer.write(String.format("%s %s %s\n", e.getDate().format(dayFormat), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat)));
+                    } else {
+                        writer.write(String.format("%s %s %s %s %s\n", e.printRecurringDays(), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat), e.getStartDate().format(dayFormat), e.getEndDate().format(dayFormat)));
+                    }
+                }
+                writer.flush();  // Ensure all data is written to the file
+                System.out.println("File write complete.");
+            } catch (IOException ex) {
+                System.out.println("Error writing to file: " + ex.getMessage());
+            }
+        } else {
+            System.out.println("Event not found.");
+        }
+    }
+
+
+
+
+
+
+    public static void go(MyCalendar calendar){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the date you would like to go to in the form of MM/DD/YYYY");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        LocalDate date = null;
+        while (date == null) {
+            String userInput = scanner.nextLine();
+            try {
+                date = LocalDate.parse(userInput, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please use MM/DD/YYYY format.");
+            }
+        }
+        displayDayEvents(date, calendar);
 
 
     }
 
+    public static void eventList(MyCalendar calendar){
 
-    public void go(){
+        calendar.printEvents("src/events.txt");
 
-    }
 
-    public void eventList(){
 
     }
 

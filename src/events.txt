@@ -1,26 +1,18 @@
-CS100W Lecture
-TR 13:30 14:45 8/22/24 12/9/24
-CS157A Lecture
-TR 16:30 17:45 8/22/24 12/9/24
-CS151 Lecture
-TR 9:00 10:15 8/22/24 12/9/24
-CS154 Lecture
-MW 16:30 17:45 8/22/24 12/9/24
-MATH39 Lecture
-MTWR 18:00 19:15 8/22/24 12/9/24
-
 Interview
-8/28/24 10:00 11:00
-Doctors Appointment
-9/3/24 8:00 10:00
-Team Meeting
-9/5/24 13:00 15:00
-Friend's Party
-9/10/24 19:00 23:00
-Birthday Party
-9/20/24 18:00 23:00
-
-Dentist Appointment
-9/29/24 15:00 16:00
-Dentist App
-9/23/24 13:00 14:00
+09/28/24 09:30 11:30
+Michael’s Birthday Party
+09/04/24 13:30 17:30
+Mall Day
+09/10/24 13:00 18:00
+Dinner Date
+09/06/24 19:00 20:00
+Doctor’s Appointment
+09/05/24 14:00 15:00
+CS151 Lecture
+TR 09:00 10:15 08/22/24 12/09/24
+CS157A Lecture
+TR 16:30 17:45 08/22/24 12/09/24
+CS154 Lecture
+MW 16:30 17:45 08/22/24 12/09/24
+CS100W Lecture
+TR 13:00 14:15 08/22/24 12/09/24
