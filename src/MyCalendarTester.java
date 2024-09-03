@@ -339,44 +339,60 @@ public class MyCalendarTester {
         calendar.printEvents("src/events.txt");
         List<Event> events = calendar.getEvents();
         System.out.println("---------------------------------------------");
-        //System.out.println("[S]elected: the user specifies the date and name of an ONE TIME event. The specific one time event will be deleted.\n" +
+        System.out.println("[S]elected: the user specifies the date and name of an ONE TIME event. The specific one time event will be deleted.\n" +
                 "[A]ll: the user specifies a date and then all ONE TIME events scheduled on the date will be deleted.\n" +
                 "[DR]: the user specifies the name of a RECURRING event. The specified recurring event will be deleted. This will delete the recurring event throughout the calendar.\n");
-        //System.out.println("Please enter one of the following:[S]elected  [A]ll   [DR] ");
-        System.out.println("Specify the event name to be removed");
-        String deleteEvent = scan.nextLine();
+        System.out.println("Please enter one of the following:[S]elected  [A]ll   [DR] ");
+        String eventInput = scan.nextLine().toUpperCase();
+        if(eventInput.equals("S"))
+        {
 
-        boolean isRemoved = false;
-        Iterator<Event> iterator = events.iterator();
-        while(iterator.hasNext()) {
-            Event e = iterator.next();
-            if(e.getEventName().equals(deleteEvent)) {
-                iterator.remove();
-                isRemoved = true;
-                System.out.println("Event removed: " + e.getEventName());
-                break;
-            }
-        }
+        }else if(eventInput.equals("A"))
+        {
 
-        if (isRemoved) {
-            System.out.println("Writing updated events back to file...");
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/events.txt"))) {
-                for (Event e : events) {
-                    writer.write(e.getEventName() + "\n");
-                    if (!e.isRecurring()) {
-                        writer.write(String.format("%s %s %s\n", e.getDate().format(dayFormat), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat)));
-                    } else {
-                        writer.write(String.format("%s %s %s %s %s\n", e.printRecurringDays(), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat), e.getStartDate().format(dayFormat), e.getEndDate().format(dayFormat)));
-                    }
+        }else if(eventInput.equals("DR"))
+        {
+            System.out.println("Please enter the name of the RECURRING event to remove");
+            String deleteEvent = scan.nextLine();
+
+            boolean isRemoved = false;
+            Iterator<Event> iterator = events.iterator();
+            while(iterator.hasNext()) {
+                Event e = iterator.next();
+                if(e.getEventName().equals(deleteEvent) && e.isRecurring()) {
+                    iterator.remove();
+                    isRemoved = true;
+                    System.out.println("Event removed: " + e.getEventName());
+                    break;
+                }else{
+                    System.out.println("Error: Invalid Event or Event is not Recurring");
                 }
-                writer.flush();  // Ensure all data is written to the file
-                System.out.println("File write complete.");
-            } catch (IOException ex) {
-                System.out.println("Error writing to file: " + ex.getMessage());
             }
-        } else {
-            System.out.println("Event not found.");
+
+            if (isRemoved) {
+                System.out.println("Writing updated events back to file...");
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/events.txt"))) {
+                    for (Event e : events) {
+                        writer.write(e.getEventName() + "\n");
+                        if (!e.isRecurring()) {
+                            writer.write(String.format("%s %s %s\n", e.getDate().format(dayFormat), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat)));
+                        } else {
+                            writer.write(String.format("%s %s %s %s %s\n", e.printRecurringDays(), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat), e.getStartDate().format(dayFormat), e.getEndDate().format(dayFormat)));
+                        }
+                    }
+                    writer.flush();  // Ensure all data is written to the file
+                    System.out.println("File write complete.");
+                } catch (IOException ex) {
+                    System.out.println("Error writing to file: " + ex.getMessage());
+                }
+            } else {
+                System.out.println("Event not found.");
+            }
+
+        }else{
+
         }
+
     }
 
 
