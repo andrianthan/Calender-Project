@@ -37,7 +37,7 @@ public class MyCalendar {
                     String[] parts = line.split(" ");
                     if(parts.length == 3)
                     {
-                        date = LocalDate.parse(parts[0], DateTimeFormatter.ofPattern("M/d/yy"));
+                        date = LocalDate.parse(parts[0], DateTimeFormatter.ofPattern("MM/dd/yy"));
                         startTime = LocalTime.parse(parts[1], DateTimeFormatter.ofPattern("H:mm"));
                         endTime = LocalTime.parse(parts[2], DateTimeFormatter.ofPattern("H:mm"));
                         Event e = new Event(eventName, date, startTime, endTime);
@@ -61,7 +61,7 @@ public class MyCalendar {
 
 
             }
-            System.out.println("Loading is done!");
+            //System.out.println("\n----------------------------------------------\nLoading is done!\n----------------------------------------------\n");
 
         }catch (IOException e) {
             System.err.println("Error reading from file: " + e.getMessage());
@@ -79,9 +79,9 @@ public class MyCalendar {
             // Only handle single events
             out.println(event.getEventName());
             out.printf("%s %s %s%n",
-                    event.getDate().format(DateTimeFormatter.ofPattern("M/d/yy")),
-                    event.getStartTime().format(DateTimeFormatter.ofPattern("H:mm")),
-                    event.getEndTime().format(DateTimeFormatter.ofPattern("H:mm")));
+                    event.getDate().format(DateTimeFormatter.ofPattern("MM/dd/yy")),
+                    event.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    event.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
             System.out.println("Event successfully added");
         } catch (IOException e) {
             System.err.println("Error writing to file: " + e.getMessage());

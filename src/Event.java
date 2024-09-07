@@ -2,46 +2,35 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
 import java.time.format.DateTimeFormatter;
+import java.time.DayOfWeek;
 
 
 public class Event {
     private String eventName;
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private LocalDate date; // For one-time events
+    private TimeInterval timeInterval;
     private boolean recurring;
-    private Set<String> recurringDays;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Set<String> recurringDays; // For recurring events
+    private LocalDate startDate; // For recurring events
+    private LocalDate endDate; // For recurring events
 
     //one time events
-    public Event(String name, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        this.eventName = name;
+// Constructor for one-time events
+    public Event(String eventName, LocalDate date, LocalTime startTime, LocalTime endTime) {
+        this.eventName = eventName;
         this.date = date;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.recurring = false; //false for one time events
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, MMM d yyyy");
-        System.out.println(name + "\n" + startTime.toString() + " " + endTime.toString() +" "+ formatter.format(date));
+        this.timeInterval = new TimeInterval(startTime, endTime);
+        this.recurring = false;
     }
 
-    //recurring events
-    public Event(String name, LocalTime startTime, LocalTime endTime, LocalDate startDate, LocalDate endDate, Set<String> recurringDays) {
-        this.eventName = name;
-        this.startTime = startTime;
-        this.endTime = endTime;
+    // Constructor for recurring events
+    public Event(String eventName, LocalTime startTime, LocalTime endTime, LocalDate startDate, LocalDate endDate, Set<String> recurringDays) {
+        this.eventName = eventName;
+        this.recurringDays = recurringDays;
+        this.timeInterval = new TimeInterval(startTime, endTime);
         this.startDate = startDate;
         this.endDate = endDate;
-        this.recurringDays = recurringDays;
-        this.recurring = true; // This event is recurring
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("E, MMM d yyyy");
-        System.out.println(name);
-        for(String s: recurringDays)
-        {
-            System.out.print(s);
-        }
-        System.out.println(" " + startTime.toString() + " " +  endTime.toString() + " " + formatter.format(startDate) + " " + formatter.format(endDate));
-
+        this.recurring = true;
     }
 
     public LocalDate getDate(){
@@ -54,11 +43,11 @@ public class Event {
 
     public LocalTime getStartTime()
     {
-        return startTime;
+        return timeInterval.getStartTime();
     }
 
     public LocalTime getEndTime(){
-        return endTime;
+        return timeInterval.getEndTime();
     }
 
     public void printOneTime(){
@@ -84,4 +73,7 @@ public class Event {
 
     public LocalDate getEndDate(){return endDate;}
 
+    public TimeInterval getTimeInterval() {
+        return timeInterval;
+    }
 }

@@ -4,6 +4,9 @@ import java.util.*;
 import java.time.format.DateTimeFormatter;
 import java.time.*;
 import java.time.format.DateTimeParseException;
+import java.time.LocalDate;
+import java.time.DayOfWeek;
+
 
 public class MyCalendarTester {
     public static void main(String [] args)
@@ -15,12 +18,14 @@ public class MyCalendarTester {
         int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue(); //gets the number value of the day of the first day of the month
         int monthLength = currentDate.lengthOfMonth(); //gets the length of the month
         int dayOfMonth = 1;
-
         System.out.println(currentDate.getMonth() + " " + currentDate.getYear());
-        System.out.println("Su Mo Tu We Th Fr Sa");
-        for(int i = 0; i < firstDayOfWeek; i++)
-        {
-            System.out.print("   ");
+        System.out.print("Su Mo Tu We Th Fr Sa");
+        if (firstDayOfWeek != DayOfWeek.SUNDAY.getValue()) {
+            // Calculate offset for the first day
+            int offset = (firstDayOfWeek == 7) ? 0 : firstDayOfWeek; // This ensures Sunday is at index 0, Monday at 1, etc.
+            for (int i = 0; i < offset; i++) {
+                System.out.print("   ");
+            }
         }
 
         while(dayOfMonth <= monthLength)
@@ -35,13 +40,17 @@ public class MyCalendarTester {
             dayOfMonth++;
         }
         System.out.println();
+        System.out.println("\n----------------------------------------------\nCurrent Events\n----------------------------------------------\n");
         calendar.loadEvents("events.txt");
+        calendar.printEvents("src/events.txt");
         System.out.println("Select one of the following main menu options:" + "\n[V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit" );
         String input = scan.next().toUpperCase();
         if(!(input.equals("Q")))
         {
             mainMenu(input,calendar);
         }
+        saveEvents(calendar);
+        System.out.println("Good Bye");
 
 
     }
@@ -56,7 +65,7 @@ public class MyCalendarTester {
         int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue();
         Scanner scan = new Scanner(System.in);
         input = input.toUpperCase();
-        System.out.println(input);
+        //System.out.println(input);
         DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
 
         Set<LocalDate> daysWithEvents = new HashSet<>();
@@ -181,7 +190,7 @@ public class MyCalendarTester {
                 input = scan.next().toUpperCase();
 
             }else if(input.equals("Q")){
-                System.out.println("Good Bye");
+
                 break;
             }else{
                 System.out.println("Please enter a valid input: [V]iew by [C]reate, [G]o to [E]vent list [D]elete [Q]uit");
@@ -189,6 +198,7 @@ public class MyCalendarTester {
             }
 
         }
+
     }
 
     public static void displayDayEvents(LocalDate currentDate, MyCalendar calendar){
@@ -217,32 +227,33 @@ public class MyCalendarTester {
 
     public static void displayMonthEvents(LocalDate currentDate, MyCalendar calendar){
         List<Event> events = calendar.getEvents();
-        LocalDate firstDayMonth = currentDate.withDayOfMonth(1); //gets the first day of current month
+        LocalDate firstDayMonth = currentDate.withDayOfMonth(1);
         DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
-        int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue();
-        int monthLength = currentDate.lengthOfMonth(); //gets the length of the month
+        int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue(); // 1 = Monday, 7 = Sunday
+        int monthLength = currentDate.lengthOfMonth();
         int dayOfMonth = 1;
 
         System.out.println(monthFormatter.format(currentDate));
         System.out.println("Su Mo Tu We Th Fr Sa");
-        int spaces = (firstDayOfWeek % 7) * 3;  // Calculating the initial spaces (Sunday starts at index 0)
-        for (int i = 0; i < spaces; i++) {
-            System.out.print(" ");
+
+        // Adjust for 0-based index if Sunday is considered the first day of the week
+        int offset = (firstDayOfWeek == 7) ? 0 : firstDayOfWeek; // This ensures Sunday is at index 0, Monday at 1, etc.
+        for (int i = 0; i < offset; i++) {
+            System.out.print("   ");
         }
+
         while (dayOfMonth <= monthLength) {
             LocalDate currentDay = firstDayMonth.withDayOfMonth(dayOfMonth);
             boolean hasEvent = false;
             for (Event event : events) {
                 if (event.isRecurring()) {
-                    // Check if the current day's day of week matches any in the event's recurringDays
                     if (event.getRecurringDays().contains(currentDay.getDayOfWeek().toString().substring(0, 1)) &&
                             !currentDay.isBefore(event.getStartDate()) &&
                             !currentDay.isAfter(event.getEndDate())) {
                         hasEvent = true;
-                        break;  // Once a match is found, no need to check further
+                        break;
                     }
                 } else {
-                    // For non-recurring events, check date directly
                     if (currentDay.equals(event.getDate())) {
                         hasEvent = true;
                         break;
@@ -251,18 +262,25 @@ public class MyCalendarTester {
             }
 
             if (currentDay.getDayOfWeek() == DayOfWeek.SUNDAY && dayOfMonth != 1) {
-                System.out.println();
+                System.out.println(); // New line for new week
             }
+
+            // Print day of month with event indicator
             if (hasEvent) {
-                System.out.print("[" + (dayOfMonth < 10 ? " " : "") + dayOfMonth + "]");
+                System.out.print("[" + dayOfMonth + "]");
             } else {
-                System.out.print((dayOfMonth < 10 ? "  " : " ") + dayOfMonth);
+                System.out.print(dayOfMonth);
             }
+
+            // Adjust spacing after the day number
+            System.out.print(dayOfMonth < 10 ? "  " : " "); // Extra space for single-digit days
+
             dayOfMonth++;
         }
-        System.out.println("\n");
-
+        System.out.println(); // Finish the last line
     }
+
+
 
     //allows users to schedule a new event
     public static void create(MyCalendar calendar){
@@ -324,8 +342,20 @@ public class MyCalendarTester {
 
         }
         Event e = new Event(eventName, date, startTime, endTime);
-        calendar.addEvent(e);
+        //calendar.addEvent(e);
         calendar.printEvents("src/events.txt");
+        try (FileWriter fileWriter = new FileWriter("src/events.txt", true); // Append to the file
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+             PrintWriter out = new PrintWriter(bufferedWriter)) {
+            out.println(e.getEventName());
+            out.printf("%s %s %s%n",
+                    e.getDate().format(DateTimeFormatter.ofPattern("MM/dd/yy")),
+                    e.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    e.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+            System.out.println("Event successfully added");
+        } catch (IOException ex) {
+            System.err.println("Error writing to file: " + ex.getMessage());
+        }
     }
 
 
@@ -337,8 +367,10 @@ public class MyCalendarTester {
         System.out.println("Loading events from file...");
         System.out.println("Current Events:\n---------------------------------------------");
         calendar.printEvents("src/events.txt");
+
+       //calendar.loadEvents("src/events.txt");
         List<Event> events = calendar.getEvents();
-        System.out.println("---------------------------------------------");
+        //System.out.println("---------------------------------------------");
         System.out.println("[S]elected: the user specifies the date and name of an ONE TIME event. The specific one time event will be deleted.\n" +
                 "[A]ll: the user specifies a date and then all ONE TIME events scheduled on the date will be deleted.\n" +
                 "[DR]: the user specifies the name of a RECURRING event. The specified recurring event will be deleted. This will delete the recurring event throughout the calendar.\n");
@@ -365,6 +397,7 @@ public class MyCalendarTester {
             while(iterator.hasNext())
             {
                 Event e = iterator.next();
+                //System.out.println(e.getDate() + " " + date + " " +e.getEventName() + " " + deleteEvent);
             if(e != null && e.getDate() != null && e.getDate().equals(date) && e.getEventName().equals(deleteEvent))
             {
                 iterator.remove();
@@ -373,7 +406,7 @@ public class MyCalendarTester {
 
             }else if (e == null || e.getDate() == null)
             {
-                //Skips a null event or event with a null date;a
+                //Skips a null event or event with a null date;
             }
             }
 
@@ -406,6 +439,8 @@ public class MyCalendarTester {
                 deleteEvent = scan.nextLine();
                 try {
                     date = LocalDate.parse(deleteEvent, formatter);
+                    date.format(DateTimeFormatter.ofPattern("MM/dd/yy"));
+
                 } catch (DateTimeParseException e) {
                     System.out.println("Invalid date format. Please use MM/DD/YYYY format.");
                 }
@@ -518,10 +553,33 @@ public class MyCalendarTester {
 
 
     }
+    public static void saveEvents(MyCalendar calendar) {
+        List<Event> events = calendar.getEvents(); // Assuming MyCalendar class has a method getEvents() that returns a List of Event objects.
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-    public void delete(){
-
+        try (PrintWriter out = new PrintWriter(new FileWriter("output.txt"))) {
+            for (Event e : events) {
+                out.println(e.getEventName()); // Print the event name
+                if (!e.isRecurring()) {
+                    // For one-time events: "09/28/24 09:30 11:30"
+                    out.printf("%s %s %s%n",
+                            e.getDate().format(dateFormatter),
+                            e.getStartTime().format(timeFormatter),
+                            e.getEndTime().format(timeFormatter));
+                } else {
+                    // For recurring events: "TR 09:00 10:15 08/22/24 12/09/24"
+                    out.printf("%s %s %s %s %s%n",
+                            e.printRecurringDays(),
+                            e.getStartTime().format(timeFormatter),
+                            e.getEndTime().format(timeFormatter),
+                            e.getStartDate().format(dateFormatter),
+                            e.getEndDate().format(dateFormatter));
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to write events to file: " + e.getMessage());
+        }
     }
-    //a
 
 }
