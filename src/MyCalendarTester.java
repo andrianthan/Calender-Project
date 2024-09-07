@@ -283,10 +283,10 @@ public class MyCalendarTester {
 
 
     //allows users to schedule a new event
-    public static void create(MyCalendar calendar){
+    public static void create(MyCalendar calendar) {
         Scanner scan = new Scanner(System.in);
         DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        DateTimeFormatter  timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
 
         System.out.println("Enter the event name:");
         String eventName = scan.nextLine().trim();
@@ -294,69 +294,60 @@ public class MyCalendarTester {
         LocalTime startTime = null;
         LocalTime endTime = null;
         boolean isBefore = false;
-        while(date == null)
-        {
+        boolean conflict = false;
+
+        while (date == null) {
             System.out.println("Please enter the date in the following format: MM/DD/YYYY");
             String dateInput = scan.nextLine().trim();
-            try{
+            try {
                 date = LocalDate.parse(dateInput, dayFormat);
-            }catch (DateTimeException e){
+            } catch (DateTimeException e) {
                 System.out.println("Error: Wrong date format");
+                continue;
             }
         }
-        while(!isBefore)
-        {
-            while(startTime == null)
-            {
-                System.out.println("Please enter the start time of the event in 24 hour clock format");
-                String startTimeInput = scan.nextLine().trim();
-                try{
-                    startTime = LocalTime.parse(startTimeInput, timeFormat);
-                }catch (DateTimeException e)
-                {
-                    System.out.println("Error: Wrong time format");
+
+        while (!isBefore) {
+            System.out.println("Please enter the start time of the event in 24 hour format");
+            String startTimeInput = scan.nextLine().trim();
+            System.out.println("Please enter the end time of the event in 24 hour format");
+            String endTimeInput = scan.nextLine().trim();
+
+            try {
+                startTime = LocalTime.parse(startTimeInput, timeFormat);
+                endTime = LocalTime.parse(endTimeInput, timeFormat);
+                if (startTime.isAfter(endTime)) {
+                    System.out.println("Start time cannot be after end time.");
+                } else if (startTime.equals(endTime)) {
+                    System.out.println("Start time and end time cannot be the same.");
+                } else {
+                    isBefore = true;
+                    TimeInterval proposedTimeInterval = new TimeInterval(startTime, endTime);
+
+                    // Filter events directly here
+                    for (Event event : calendar.getEvents()) {
+                        if (!event.isRecurring() && event.getDate().equals(date) && proposedTimeInterval.overLap(event.getTimeInterval())) {
+                            System.out.println("Conflict with existing event: " + event.getEventName());
+                            conflict = true;
+                            break;
+                        }
+                    }
                 }
+            } catch (DateTimeException e) {
+                System.out.println("Error: Wrong time format");
             }
-
-            while(endTime == null)
-            {
-                System.out.println("Please enter the end time of the event in 24 hour clock format");
-                String endTimeInput = scan.nextLine().trim();
-                try{
-                    endTime = LocalTime.parse(endTimeInput, timeFormat);
-                }catch (DateTimeException e)
-                {
-                    System.out.println("Error: Wrong time format");
-                }
-            }
-            if(startTime.isAfter(endTime))
-            {
-                System.out.println("The start time of event if after end time. Please try again");
-            }else if(startTime.isBefore((endTime)))
-            {
-                isBefore = true;
-            }else{
-                System.out.println("The start time of event is the same as end time. Please try again");
-            }
-
-
         }
-        Event e = new Event(eventName, date, startTime, endTime);
-        //calendar.addEvent(e);
-        calendar.printEvents("src/events.txt");
-        try (FileWriter fileWriter = new FileWriter("src/events.txt", true); // Append to the file
-             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-             PrintWriter out = new PrintWriter(bufferedWriter)) {
-            out.println(e.getEventName());
-            out.printf("%s %s %s%n",
-                    e.getDate().format(DateTimeFormatter.ofPattern("MM/dd/yy")),
-                    e.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm")),
-                    e.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-            System.out.println("Event successfully added");
-        } catch (IOException ex) {
-            System.err.println("Error writing to file: " + ex.getMessage());
+
+        if (!conflict && isBefore) {
+            Event newEvent = new Event(eventName, date, startTime, endTime);
+            calendar.addEvent(newEvent);
+            System.out.println("Event successfully added.");
+        } else if (!isBefore) {
+            System.out.println("Event not added due to invalid time input.");
         }
     }
+
+
 
 
     public static void remove(MyCalendar calendar) {
