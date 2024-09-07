@@ -3,16 +3,29 @@ import java.time.*;
 import java.util.*;
 import java.time.format.DateTimeFormatter;
 
-
+/**
+ * MyCalendar class represents a calendar object which stores and manages events.
+ * can load events from a file, add events, print events, and provide access events in calendar object.
+ */
 
 public class MyCalendar {
     private List<Event> events;
     private LocalDate currentDate;
 
+    /**
+     * constructs a new MyCalendar object by initializing events object
+     * and setting currentDate.
+     */
+
     public MyCalendar() {
         events = new ArrayList<>();
         currentDate = LocalDate.now();
     }
+
+
+    /**
+     * loads events from a specified file and adds them to calendar
+     */
 
     public void loadEvents(String file)
     {
@@ -71,6 +84,11 @@ public class MyCalendar {
 
     }
 
+    /**
+     * adds an event object and appends it to the events file.
+     * only is able to add one-time events
+     */
+
     public void addEvent(Event event)
     {
         try (FileWriter fileWriter = new FileWriter("src/events.txt", true); // Append to the file
@@ -89,8 +107,16 @@ public class MyCalendar {
 
     }
 
+    /**
+     * returns a list of events
+     */
+
     public List<Event> getEvents(){ return events;}
 
+    /**
+     * prints both one-time events and recurring events in a specified format.
+     * categories events based on if they are one-time or recurring
+     */
 
     public void printEvents(String file) {
         DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("MM/dd/yy");

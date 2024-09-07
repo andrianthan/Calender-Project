@@ -1,9 +1,14 @@
+Interview
+09/28/24 09:30 11:30
 Birthday Party
 09/04/24 13:30 17:30
+Mall Day
+09/10/24 13:00 18:00
 Dinner Date
 09/06/24 19:00 20:00
 Doctor’s Appointment
 09/05/24 14:00 15:00
+
 CS151 Lecture
 TR 09:00 10:15 08/22/24 12/09/24
 CS157A Lecture
@@ -14,5 +19,3 @@ CS100W Lecture
 TR 13:00 14:15 08/22/24 12/09/24
 MATH39 Lecture
 MW 13:00 14:15 08/22/24 12/09/24
-Test
-09/04/24 13:30 17:30

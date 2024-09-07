@@ -1,5 +1,4 @@
 import java.io.*;
-
 import java.util.*;
 import java.time.format.DateTimeFormatter;
 import java.time.*;
@@ -8,7 +7,21 @@ import java.time.LocalDate;
 import java.time.DayOfWeek;
 
 
+/**
+ * MyCalendarTester run the calendar application
+ * allows users to load events, view the calendar
+ * using day/month view, create new events, delete existing events,
+ * and save events to a file.
+ */
+
 public class MyCalendarTester {
+
+    /**
+     * main method initializes the calendar, loads events,
+     * and handles the user input for interacting
+     * with the calendar through the main menu.
+     */
+
     public static void main(String [] args)
     {
         Scanner scan = new Scanner(System.in);
@@ -55,7 +68,11 @@ public class MyCalendarTester {
 
     }
 
-    //method that lets users choose between the day/month view of the calendar
+    /**
+     * displays day/month view of calendar based on user input.
+     * allows user to navigate between previous/next days & months.
+     */
+
     public static void view(String input, MyCalendar calendar){
         List<Event> events = calendar.getEvents();
         LocalDate currentDate = LocalDate.now();
@@ -71,14 +88,14 @@ public class MyCalendarTester {
         Set<LocalDate> daysWithEvents = new HashSet<>();
         for (Event event : events) {
             if (event.isRecurring()) {
-                // Assuming recurring events occur from startDate to endDate
+                // assuming recurring events occur from startDate to endDate
                 if ((event.getStartDate().isBefore(firstDayMonth.plusMonths(1)) && event.getEndDate().isAfter(firstDayMonth.minusDays(1)))) {
                     LocalDate eventDay = event.getStartDate();
                     while (!eventDay.isAfter(event.getEndDate())) {
                         if (eventDay.getMonth() == currentDate.getMonth()) {
                             daysWithEvents.add(eventDay);
                         }
-                        eventDay = eventDay.plusDays(1); // Increment day by day within the event period
+                        eventDay = eventDay.plusDays(1); // increment day by day within the event period
                     }
                 }
             } else {
@@ -154,6 +171,13 @@ public class MyCalendarTester {
 
     }
 
+    /**
+     * displays the main menu and processes user input.
+     * allows user choose from viewing events, creating new events, navigating to a specific date, deleting events,
+     * or quiting the program.
+     *
+     */
+
     public static void mainMenu(String input, MyCalendar calendar)
     {
         Scanner scan = new Scanner(System.in);
@@ -201,6 +225,12 @@ public class MyCalendarTester {
 
     }
 
+
+    /**
+     * displays scheduled events for a specific day
+     *
+     */
+
     public static void displayDayEvents(LocalDate currentDate, MyCalendar calendar){
 
         DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E, MMM d yyyy");
@@ -224,6 +254,11 @@ public class MyCalendarTester {
         }
         System.out.println();
     }
+
+    /**
+     * displays scheduled events for a specific month
+     *
+     */
 
     public static void displayMonthEvents(LocalDate currentDate, MyCalendar calendar){
         List<Event> events = calendar.getEvents();
@@ -282,7 +317,12 @@ public class MyCalendarTester {
 
 
 
-    //allows users to schedule a new event
+    /**
+     * allows users to create a one time event by specifying event name, date, start time, and
+     * end time. Also checks for conflicts in event scheduling/timing
+     *
+     */
+
     public static void create(MyCalendar calendar) {
         Scanner scan = new Scanner(System.in);
         DateTimeFormatter dayFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -324,8 +364,7 @@ public class MyCalendarTester {
                     isBefore = true;
                     TimeInterval proposedTimeInterval = new TimeInterval(startTime, endTime);
 
-                    // Filter events directly here
-                    for (Event event : calendar.getEvents()) {
+                    for (Event event : calendar.getEvents()) { //filter events
                         if (!event.isRecurring() && event.getDate().equals(date) && proposedTimeInterval.overLap(event.getTimeInterval())) {
                             System.out.println("Conflict with existing event: " + event.getEventName());
                             conflict = true;
@@ -349,6 +388,12 @@ public class MyCalendarTester {
 
 
 
+    /**
+     * allows the user to remove a one-time or recurring event by specifying the name and date
+     * users choose between deleting a single one time event, deleting all events on a specific date,
+     * or delete a recurring event.
+     *
+     */
 
     public static void remove(MyCalendar calendar) {
         Scanner scan = new Scanner(System.in);
@@ -397,7 +442,7 @@ public class MyCalendarTester {
 
             }else if (e == null || e.getDate() == null)
             {
-                //Skips a null event or event with a null date;
+                //skips null event
             }
             }
 
@@ -412,7 +457,7 @@ public class MyCalendarTester {
                             writer.write(String.format("%s %s %s %s %s\n", e.printRecurringDays(), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat), e.getStartDate().format(dayFormat), e.getEndDate().format(dayFormat)));
                         }
                     }
-                    writer.flush();  // Ensure all data is written to the file
+                    writer.flush();
                     System.out.println("File write complete.");
                 } catch (IOException ex) {
                     System.out.println("Error writing to file: " + ex.getMessage());
@@ -445,7 +490,7 @@ public class MyCalendarTester {
                     isRemoved = true;
                     System.out.println("Event removed: " + e.getEventName());
                 } else if (e == null || e.getDate() == null) {
-                    //Skips a null event or event with a null data;
+                    //skips null event;
                 }
             }
 
@@ -499,7 +544,7 @@ public class MyCalendarTester {
                             writer.write(String.format("%s %s %s %s %s\n", e.printRecurringDays(), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat), e.getStartDate().format(dayFormat), e.getEndDate().format(dayFormat)));
                         }
                     }
-                    writer.flush();  // Ensure all data is written to the file
+                    writer.flush();
                     System.out.println("File write complete.");
                 } catch (IOException ex) {
                     System.out.println("Error writing to file: " + ex.getMessage());
@@ -518,6 +563,10 @@ public class MyCalendarTester {
 
 
 
+    /**
+     * allows the user to go to a specific date and see which events are scheduled for that date
+     *
+     */
 
     public static void go(MyCalendar calendar){
         Scanner scanner = new Scanner(System.in);
@@ -537,6 +586,10 @@ public class MyCalendarTester {
 
     }
 
+    /**
+     * allows user to see all one-time and recurring events that are scheduled
+     *
+     */
     public static void eventList(MyCalendar calendar){
 
         calendar.printEvents("src/events.txt");
@@ -544,22 +597,28 @@ public class MyCalendarTester {
 
 
     }
+
+    /**
+     * saves and formats all events in calendar and creates an output file
+     *
+     */
+
     public static void saveEvents(MyCalendar calendar) {
-        List<Event> events = calendar.getEvents(); // Assuming MyCalendar class has a method getEvents() that returns a List of Event objects.
+        List<Event> events = calendar.getEvents();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
         try (PrintWriter out = new PrintWriter(new FileWriter("output.txt"))) {
             for (Event e : events) {
-                out.println(e.getEventName()); // Print the event name
+                out.println(e.getEventName()); // print event name
                 if (!e.isRecurring()) {
-                    // For one-time events: "09/28/24 09:30 11:30"
+                    // for one time events
                     out.printf("%s %s %s%n",
                             e.getDate().format(dateFormatter),
                             e.getStartTime().format(timeFormatter),
                             e.getEndTime().format(timeFormatter));
                 } else {
-                    // For recurring events: "TR 09:00 10:15 08/22/24 12/09/24"
+                    // for recurring events
                     out.printf("%s %s %s %s %s%n",
                             e.printRecurringDays(),
                             e.getStartTime().format(timeFormatter),
