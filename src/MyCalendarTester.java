@@ -264,15 +264,14 @@ public class MyCalendarTester {
         List<Event> events = calendar.getEvents();
         LocalDate firstDayMonth = currentDate.withDayOfMonth(1);
         DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("MMMM yyyy");
-        int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue(); // 1 = Monday, 7 = Sunday
+        int firstDayOfWeek = firstDayMonth.getDayOfWeek().getValue();
         int monthLength = currentDate.lengthOfMonth();
         int dayOfMonth = 1;
 
         System.out.println(monthFormatter.format(currentDate));
         System.out.println("Su Mo Tu We Th Fr Sa");
 
-        // Adjust for 0-based index if Sunday is considered the first day of the week
-        int offset = (firstDayOfWeek == 7) ? 0 : firstDayOfWeek; // This ensures Sunday is at index 0, Monday at 1, etc.
+        int offset = (firstDayOfWeek == 7) ? 0 : firstDayOfWeek;
         for (int i = 0; i < offset; i++) {
             System.out.print("   ");
         }
@@ -297,22 +296,22 @@ public class MyCalendarTester {
             }
 
             if (currentDay.getDayOfWeek() == DayOfWeek.SUNDAY && dayOfMonth != 1) {
-                System.out.println(); // New line for new week
+                System.out.println();
             }
 
-            // Print day of month with event indicator
+            //print day/month
             if (hasEvent) {
                 System.out.print("[" + dayOfMonth + "]");
             } else {
                 System.out.print(dayOfMonth);
             }
 
-            // Adjust spacing after the day number
+            //adjust spacing
             System.out.print(dayOfMonth < 10 ? "  " : " "); // Extra space for single-digit days
 
             dayOfMonth++;
         }
-        System.out.println(); // Finish the last line
+        System.out.println();
     }
 
 
@@ -343,7 +342,6 @@ public class MyCalendarTester {
                 date = LocalDate.parse(dateInput, dayFormat);
             } catch (DateTimeException e) {
                 System.out.println("Error: Wrong date format");
-                continue;
             }
         }
 
@@ -505,7 +503,7 @@ public class MyCalendarTester {
                             writer.write(String.format("%s %s %s %s %s\n", e.printRecurringDays(), e.getStartTime().format(timeFormat), e.getEndTime().format(timeFormat), e.getStartDate().format(dayFormat), e.getEndDate().format(dayFormat)));
                         }
                     }
-                    writer.flush();  // Ensure all data is written to the file
+                    writer.flush();
                     System.out.println("File write complete.");
                 } catch (IOException ex) {
                     System.out.println("Error writing to file: " + ex.getMessage());

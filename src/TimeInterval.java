@@ -3,7 +3,7 @@ import java.time.LocalTime;
 /**
  * the TimeInterval class represents a time interval with a start time and an end time.
  * provides methods to check if the time interval of a specified event overlaps with t
- * he time interval of another event.
+ * the time interval of another event.
  */
 
 public class TimeInterval {
