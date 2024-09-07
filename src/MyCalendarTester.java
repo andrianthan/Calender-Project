@@ -608,7 +608,7 @@ public class MyCalendarTester {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        try (PrintWriter out = new PrintWriter(new FileWriter("output.txt"))) {
+        try (PrintWriter out = new PrintWriter(new FileWriter("src/output.txt"))) {
             for (Event e : events) {
                 out.println(e.getEventName()); // print event name
                 if (!e.isRecurring()) {
