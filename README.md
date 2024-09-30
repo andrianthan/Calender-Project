@@ -1,4 +1,4 @@
-# My First Calendar - CS151 Fall 2024
+# My First Calendar 
 
 ## Overview
 
